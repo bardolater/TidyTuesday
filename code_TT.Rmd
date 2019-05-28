@@ -21,8 +21,10 @@ sessionInfo()
 Wine ranking
 
 ```{r 28/05}
-wine <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-05-28/winemag-data-130k-v2.csv")
+library(ggstance)
+#wine <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-05-28/winemag-data-130k-v2.csv")
 
+color = RColorBrewer::brewer.pal(3,'Blues')
 lineplot = wine %>%
   group_by(country) %>%
   drop_na(country) %>%
@@ -31,21 +33,25 @@ lineplot = wine %>%
             n = n()) %>%
   drop_na(SD) %>%
   arrange(mean) %>%
-  mutate(signif = as.factor(ifelse(n>100,2,1)))
+  mutate(signif = as.factor(ifelse(n>100,color[1],color[3])))
 
 x= lineplot$country
 lineplot$country = factor(lineplot$country, levels = x)
   
-p = ggplot(lineplot, aes(x=country, y=mean, ymin=mean-SD, ymax=mean+SD, color=signif)) +
-  geom_pointrange() +
-  coord_flip() +
-  ylab('Mean Score') +
-  xlab('') +
+p = ggplot(lineplot, aes(y=country, x=mean, xmin=mean-SD, xmax=mean+SD, color= I(signif))) +
+  geom_point() +
+  geom_errorbarh() +
+  ylab('') +
+  xlab('Mean Review Score') +
   theme_light() +
-  scale_color_discrete('', labels= c('less than a 100 wine reviewed', 'more than a 100 wine reviewed')) +
+  scale_color_discrete('Number of review:', labels= c('< 100 review', '> 100 review')) +
   labs(title = "Which country produce the best wine?",
        caption = "Source: WineEnthusiast") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.text.y  = element_text(size=8.5),
+        panel.grid.major.x=element_blank(),
+        panel.grid.minor.x=element_blank()) 
+p
 ggsave(p, filename = 'WineRanking.jpeg', device = 'jpeg', path = '/Users/s.chauquet/Documents/DataScience/TidyTuesday')
 ```
 
