@@ -1,0 +1,51 @@
+---
+title: "TidyTuesday"
+author: "Solal Chauquet"
+date: "5/28/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## TidyTuesday
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+sessionInfo()
+```
+
+28/05/19: 
+Wine ranking
+
+```{r 28/05}
+wine <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-05-28/winemag-data-130k-v2.csv")
+
+lineplot = wine %>%
+  group_by(country) %>%
+  drop_na(country) %>%
+  summarise(mean = mean(points), 
+            SD = sd(points), 
+            n = n()) %>%
+  drop_na(SD) %>%
+  arrange(mean) %>%
+  mutate(signif = as.factor(ifelse(n>100,2,1)))
+
+x= lineplot$country
+lineplot$country = factor(lineplot$country, levels = x)
+  
+p = ggplot(lineplot, aes(x=country, y=mean, ymin=mean-SD, ymax=mean+SD, color=signif)) +
+  geom_pointrange() +
+  coord_flip() +
+  ylab('Mean Score') +
+  xlab('') +
+  theme_light() +
+  scale_color_discrete('', labels= c('less than a 100 wine reviewed', 'more than a 100 wine reviewed')) +
+  labs(title = "Which country produce the best wine?",
+       caption = "Source: WineEnthusiast") +
+  theme(plot.title = element_text(hjust = 0.5))
+ggsave(p, filename = 'WineRanking.jpeg', device = 'jpeg', path = '/Users/s.chauquet/Documents/DataScience/TidyTuesday')
+```
+
