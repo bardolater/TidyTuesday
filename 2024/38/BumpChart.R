@@ -1,9 +1,8 @@
-#----------------------------------
+#------------------------------------------------------------------------------
 ### Bump chart of ranks of top 7 characters in Romeo and Juliet by lines spoken
-
-#----------------------------------
-
-
+### Plot by @DataAngler@vis.social
+### Tidy Tuesday Week 38
+#------------------------------------------------------------------------------
 
 library(tidyverse)
 library(ggtext)
